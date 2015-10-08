@@ -20,5 +20,4 @@ class Graph
         T getEdgeWeight(int from, int to);
 };
 
-
 #endif
