@@ -11,11 +11,11 @@ prep:
 run:
 	./main
 
-main: graph
+main: k2
 	$(CC) -c $(SRC_DIR)/main.cc -o $(OBJ_DIR)/main.o
 
-graph:
-	$(CC) -c $(SRC_DIR)/graph.cc -o $(OBJ_DIR)/graph.o
+k2:
+	$(CC) -c $(SRC_DIR)/k2.cc -o $(OBJ_DIR)/k2.o
 
 clean:
 	rm -rf ./obj/*.o

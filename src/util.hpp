@@ -16,6 +16,7 @@
 #include <cctype>
 #include <iomanip>
 #include <ctime>
+#include <exception>
 #include <climits>
 
 #define endl "\n"
