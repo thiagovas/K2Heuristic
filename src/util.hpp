@@ -16,8 +16,8 @@
 #include <cctype>
 #include <iomanip>
 #include <ctime>
-#include <exception>
 #include <climits>
+#include <cassert>
 
 #define endl "\n"
 #define INF INT_MAX

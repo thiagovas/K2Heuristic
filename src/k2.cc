@@ -1,5 +1,4 @@
 #include "k2.hpp"
-#include "cExceptions.hpp"
 using namespace std;
 
 K2::K2()
@@ -10,7 +9,7 @@ K2::K2()
 
 void K2::setGraph(Graph<int> *pg)
 {
-    if(pg==NULL) throw nullGraphException;
+    assert(pg!=NULL);
     this->_graph=pg;
 }
 
