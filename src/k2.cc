@@ -22,7 +22,7 @@ vector<parents> K2::runK2(Database *db, int u)
     vector<parents> result;
     for(int i=0; i < this->_graph->getnNodes(); i++)
     {
-        parents pi(i); // Parents of i
+        parents pi(i, this->_graph->getnNodes()); // Parents of i
         double oldProb = db->calcProb(i, pi); // Calling the g function
         bool okToProceed=true;
         

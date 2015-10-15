@@ -5,14 +5,12 @@
 
 typedef struct sParents {
     int node; // The index of the node
-    std::set<int> p; // Its parents
+    std::unordered_set<int> p; // Its parents
 
-    sParents(int pNode)
-    { node=pNode; }
-    
-    sParents(int pNode, std::set<int> np)
+    // Id do verticee e o numero maximo de pais que ele pode ter
+    sParents(int pNode, int nParents)
     {
-        p=np; //HUE
+        p.reserve(nParents);
         node=pNode;
     }
 } parents;
