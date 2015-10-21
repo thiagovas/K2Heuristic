@@ -13,10 +13,10 @@ prep:
 run:
 	./main
 
-main: k2
+main: k2 graph
 	$(CC) -c $(SRC_DIR)/main.cc -o $(OBJ_DIR)/main.o -std=$(STD) -$(OPTM)
 
-k2: database
+k2: database graph
 	$(CC) -c $(SRC_DIR)/k2.cc -o $(OBJ_DIR)/k2.o -std=$(STD) -$(OPTM)
 
 database: document
@@ -25,10 +25,14 @@ database: document
 document:
 	$(CC) -c $(SRC_DIR)/document.cc -o $(OBJ_DIR)/document.o -std=$(STD) -$(OPTM)
 
+graph:
+	$(CC) -c $(SRC_DIR)/graph.cc -o $(OBJ_DIR)/graph.o -std=$(STD) -$(OPTM)
+
 indextree:
 	$(CC) -c $(SRC_DIR)/indextree.cc -o $(OBJ_DIR)/indextree.o -std=$(STD) -$(OPTM)
 
 clean:
+	clear
 	rm -rf ./obj/*.o
 	rm -rf *~
 	rm -f main
