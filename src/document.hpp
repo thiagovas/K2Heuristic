@@ -10,9 +10,11 @@ class Document {
         int nFeatures;
 
     public:
-        Document(int _nFeatures); // Number of features a document has.
-        void initFeatures(int _nFeatures, int value);
-        void initFeatures(std::vector<int> vFeatures);
+        // Number of features a document has.
+        Document(int _nFeatures, int defaultvalue=0);
+        void initFeatures(int _nFeatures, int defaultvalue);
+        void setFeature(int index, int value);
+        int getFeature(int index);
 };
 
 #endif

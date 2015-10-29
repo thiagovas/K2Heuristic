@@ -2,10 +2,7 @@
 using namespace std;
 
 K2::K2()
-{
-    this->_graph = NULL;
-    // Set the Database as NULL as well.
-}
+{ this->_graph = NULL; }
 
 void K2::setGraph(Graph<int> *pg)
 {
@@ -23,7 +20,7 @@ vector<parents> K2::runK2(Database *db, int u)
     for(int i=0; i < this->_graph->getnNodes(); i++)
     {
         parents pi(i, this->_graph->getnNodes()); // Parents of i
-        double oldProb = db->calcProb(i, pi); // Calling the g function
+        double oldProb = db->calcProb(i, pi); // TODO: BUGGY <<<<<<<--------- Calling the g function
         bool okToProceed=true;
         
         while(okToProceed && pi.p.size() < u)
@@ -37,7 +34,7 @@ vector<parents> K2::runK2(Database *db, int u)
             {
                 if(pi.p.find(*it) != pi.p.end()) continue;
                 
-                if(tempProb=db->calcProb(i, pi, *it) > newProb)
+                if((tempProb=db->calcProb(i, pi, *it)) > newProb)
                 {
                     newProb = tempProb;
                     maxProbNode = *it;

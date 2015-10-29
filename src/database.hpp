@@ -8,7 +8,7 @@ typedef struct sParents {
     int node; // The index of the node
     std::unordered_set<int> p; // Its parents
 
-    // Id do verticee e o numero maximo de pais que ele pode ter
+    // Id do vertice e e o numero maximo de pais que ele pode ter
     sParents(int pNode, int nParents)
     {
         p.reserve(nParents);
@@ -24,15 +24,26 @@ class Database {
         bool _featuresPreProcessed;
         int _nBins;
         
+        ll calcSum(int begin, int end);
+        
+        /*
+         *  This function returns the number of documents that has
+         *  feature[node1]=value 1 and feature[node2]=value2
+         */
+        int countOcurrences(int node1, int value1, int node2, int value2);
+        int countOcurrences(int node, int value, std::map<int, int> parents);
+
     public:
         
         Database(int nBins);
         
         Database(int nBins, std::vector<Document> vDocuments);
 
-        double calcProb(int node, parents vp);
+        /* Returns the log of the probability function, for precision issues. */
+        ll calcProb(int node, parents vp);
         
-        double calcProb(int node, parents vp, int extraParent);
+        /* Returns the log of the probability function, for precision issues. */
+        ll calcProb(int node, parents vp, int extraParent);
         
         //void loadDatabase(); // constructor?
         
@@ -45,6 +56,5 @@ class Database {
         /* Pre Process every kind of feature data used by calcProb */
         void preProcessFeatures();        
 };
-
 
 #endif

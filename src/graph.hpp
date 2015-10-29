@@ -15,6 +15,7 @@ class Graph
         Graph(){}
         Graph(int nNodes);
         
+        void init(int nNodes);
         void clear();
         void addEdge(int from, int to, T weight);
         T getEdgeWeight(int from, int to);

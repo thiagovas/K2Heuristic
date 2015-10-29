@@ -10,10 +10,7 @@ build: prep main
 prep:
 	mkdir -p $(OBJ_DIR)
 
-run:
-	./main
-
-main: k2 graph
+main: k2 graph database
 	$(CC) -c $(SRC_DIR)/main.cc -o $(OBJ_DIR)/main.o -std=$(STD) -$(OPTM)
 
 k2: database graph
