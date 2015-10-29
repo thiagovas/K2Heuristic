@@ -20,7 +20,7 @@ vector<parents> K2::runK2(Database *db, int u)
     for(int i=0; i < this->_graph->getnNodes(); i++)
     {
         parents pi(i, this->_graph->getnNodes()); // Parents of i
-        double oldProb = db->calcProb(i, pi); // TODO: BUGGY <<<<<<<--------- Calling the g function
+        double oldProb = db->calcProb(i, pi);
         bool okToProceed=true;
         
         while(okToProceed && pi.p.size() < u)
