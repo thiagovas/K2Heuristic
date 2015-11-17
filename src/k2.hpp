@@ -7,13 +7,16 @@
 
 class K2
 {
-    private:
-        Graph<int> *_graph;
-        
-    public:
-        K2();
-        void setGraph(Graph<int> *g);
-        std::vector<parents> runK2(Database *db, int u);
+  private:
+    Graph<int> *_graph;
+    vector<parents> resultK2; // It keeps the list of parents that k2 generates
+    
+  public:
+    K2();
+    void setGraph(Graph<int> *g);
+    void runK2(Database *db, int u);
+    vector<parents> getParents();
+    
 };
 
 #endif

@@ -53,7 +53,7 @@ int main()
       for(int j = 2; j < vInput[i].size()-1; j++)
       {
         vector<string> vAux = splitstr(vInput[i][j], ":");
-        d.setFeature(stoi(vAux[0]), stoi(vAux[1]));
+        d.setFeature(stoi(vAux[0])-1, stoi(vAux[1]));
       }
       vd.push_back(d);
     }
@@ -64,15 +64,27 @@ int main()
       for(int j = i+1; j < nFeatures; j++)
         g->addEdge(i, j, 0);
     heuristic->setGraph(g);
-    vector<parents> resp = heuristic->runK2(db, 5);
+    
+    heuristic->runK2(db, 5);
+    vector<parents> resp = heuristic->getParents();
     
     for(int i = 0; i < resp.size(); i++)
     {
-      cout << "Node " << resp[i].node;
-      for(unordered_set<int>::iterator it = resp[i].p.begin(); it != resp[i].p.end(); it++)
+      cout << "Node " << resp[i].node << " (" << resp[i].myParents.size() << ") :";
+      for(unordered_set<int>::iterator it = resp[i].myParents.begin(); it != resp[i].myParents.end(); it++)
         cout << " " << *it;
       cout << endl << endl;
     }
     
+    /* Printing a random feature */
+    vector<int> randomFeatures = db->generateNewPoint(resp);
+    for(int i = 0; i < randomFeatures.size(); i++)
+      cout << randomFeatures[i] << " ";
+    cout << endl;
+    
+    delete g;
+    delete heuristic;
+    delete db;
+
     return 0;
 }
