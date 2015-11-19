@@ -26,7 +26,7 @@ class Database
     bool _featuresPreProcessed;
     int _nBins;
     
-    ll calcSum(int begin, int end);
+    double calcSum(int begin, int end);
     
     /*
      *  This function returns the number of documents that has
@@ -43,10 +43,10 @@ class Database
     Database(int nBins, std::vector<Document> vDocuments);
     
     /* Returns the log of the probability function, for precision issues. */
-    ll calcProb(int node, parents vp);
+    double calcProb(int node, parents vp);
     
     /* Returns the log of the probability function, for precision issues. */
-    ll calcProb(int node, parents vp, int extraParent);
+    double calcProb(int node, parents vp, int extraParent);
     
     void addDocument(Document *d);
     

@@ -53,7 +53,6 @@ void K2::runK2(Database *db, int u)
             // Adding new parent for the node i.
             if(newProb > oldProb)
             {
-                cout << "feature = " << i << " z = " << maxProbNode << " P_new = " << newProb << " P_old = " << oldProb << endl;  
                 oldProb=newProb;
                 pi->myParents.insert(maxProbNode);
                 this->resultK2[maxProbNode].parentsOf.push_back(i);

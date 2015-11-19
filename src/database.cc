@@ -65,53 +65,54 @@ int Database::countOcurrences(int node, int value, map<int, int> parents)
 }
 
 /* Basically calculates \sum_{begin}^{end} */
-ll Database::calcSum(int begin, int end)
+double Database::calcSum(int begin, int end)
 {
   if(end < begin) return 0;
-  return (begin+end)*(end-begin+1)/2;
-}
-
-/* Returns the log of the probability function, for precision issues. */
-ll Database::calcProb(int node, parents vp)
-{
-  ll resp=0;
-  
-  if(this->_uniqueFeatures.size()==0) this->preProcessFeatures();
-  
-  for(unsigned int i = 0; i < this->_vDocuments.size(); i++)
-  {
-    ll nij = 0; // Just following the paper's names.
-    ll lhsp=0, rhs=0; // Left Hand Side and Right Hand Side of the Productory
-    ll div=0; // (Nij + ri - 1)
-    
-    map<int, int> parentsValues;
-    int parentsFeature = this->_vDocuments[i].getFeature(node);
-    for(auto it = vp.myParents.begin(); it != vp.myParents.end(); it++)
-      parentsValues[*it] = parentsFeature;
-    
-    //Calculating the Left Hand Side of the productory
-    for(set<int>::iterator nIt = this->_uniqueFeatures[node].begin(); nIt != this->_uniqueFeatures[node].end(); nIt++) // Foreach possible value of the node...
-    {  
-      int ocurrences = countOcurrences(node, *nIt, parentsValues);
-      nij += ocurrences;
-      rhs += calcSum(0, ocurrences);
-      if(node==0) cout << "Node 0 - NIJK = " << ocurrences << endl;
-    }
-    lhsp = calcSum(0, this->_countFeatures[node]-1);
-    div = calcSum(0, nij+this->_countFeatures[node]-1); 
-    
-    if(node==0)
-    cout << "Node = " << node << " (LHSP = " << lhsp << ") + (RHSP = " << rhs << ") - (DIV = " << div << ") TOTAL="
-         << lhsp+rhs-div << " NIJ = " << nij << endl;
-    // Refreshing resp...
-    resp += lhsp+rhs-div;
-  }
-  cout << "TOTAL = " << resp << endl;
+  double resp=0;
+  for(int i = max(2, begin); i <= end; i++)
+    resp += log(i);
   return resp;
 }
 
 /* Returns the log of the probability function, for precision issues. */
-ll Database::calcProb(int node, parents vp, int extraParent)
+double Database::calcProb(int node, parents vp)
+{
+  double resp=0;
+  double nij = 0; // Just following the paper's names.
+  double lhsp=0, rhs=0; // Left Hand Side and Right Hand Side of the Productory
+  double div=0; // (Nij + ri - 1)
+  
+  if(this->_uniqueFeatures.size()==0) this->preProcessFeatures();
+  
+  set<map<int, int> > parentsInstances;
+  for(unsigned int i = 0; i < this->_vDocuments.size(); i++)
+  {
+    map<int, int> parentsValues;
+    for(auto it = vp.myParents.begin(); it != vp.myParents.end(); it++)
+      parentsValues[*it] = this->_vDocuments[i].getFeature(*it);
+    parentsInstances.insert(parentsValues);
+  }
+  
+  for(set<map<int, int> >::iterator nJt = parentsInstances.begin(); nJt != parentsInstances.end(); nJt++)
+  {
+    nij=0;
+
+    for(set<int>::iterator nIt = this->_uniqueFeatures[node].begin(); nIt != this->_uniqueFeatures[node].end(); nIt++) // Foreach possible value of the node...
+    {
+      int ocurrences = countOcurrences(node, *nIt, *nJt);
+      rhs += calcSum(1, ocurrences);
+      nij+=ocurrences;
+    }
+    div += calcSum(1, nij+this->_countFeatures[node]-1);
+    lhsp += calcSum(1, this->_countFeatures[node]-1);
+  }
+  resp = lhsp+rhs-div;
+  
+  return resp;
+}
+
+/* Returns the log of the probability function, for precision issues. */
+double Database::calcProb(int node, parents vp, int extraParent)
 {
   vp.myParents.insert(extraParent);
   return calcProb(node, vp);
