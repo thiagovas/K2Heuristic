@@ -3,6 +3,7 @@
 
 #include "util.hpp"
 #include "document.hpp"
+#include "indextree.hpp"
 
 typedef struct sParents {
   int node; // The index of the node
@@ -19,56 +20,33 @@ typedef struct sParents {
 
 class Database
 {
-  private:
-    std::vector<Document> _vDocuments;
-    std::vector<int> _countFeatures; // Each position keeps the number of different features
-    std::vector<std::set<int> > _uniqueFeatures; // Each set keeps all possible features
-    bool _featuresPreProcessed;
-    int _nBins;
-    
-    double calcSum(int begin, int end);
-    
-    /*
-     *  This function returns the number of documents that has
-     *  feature[node1]=value 1 and feature[node2]=value2
-     */
-    int countOcurrences(int node1, int value1, int node2, int value2);
-    int countOcurrences(int node, int value, std::map<int, int> parents);
-    
-    
   public:
     
-    Database(int nBins);
-    
-    Database(int nBins, std::vector<Document> vDocuments);
+    Database(std::vector<Document> &vDocuments);
     
     /* Returns the log of the probability function, for precision issues. */
-    double calcProb(int node, parents vp);
+    double CalcProb(int node, parents &vp, int extraParent=-1);
     
-    /* Returns the log of the probability function, for precision issues. */
-    double calcProb(int node, parents vp, int extraParent);
+    void AddDocument(Document *d);
     
-    void addDocument(Document *d);
+    void SetvDocuments(std::vector<Document> vDocuments);
     
-    void setvDocuments(std::vector<Document> vDocuments);
+    void ClearvDocuments();
     
-    void clearvDocuments();
-    
-    /* Pre Process every kind of feature data used by calcProb */
-    void preProcessFeatures();
-    
-    /* Pass the vector<parents> as unique_ptr, maybe?? */
-    std::vector<int> generateNewPoint(std::vector<parents> vp);
+    std::vector<int> GenerateNewPoint(std::vector<parents> &vp) const;
     
     /* Returns a random feature of the [index] position.
        The feature will be randomly selected among the documents
        that has the same features as the [base] document.
        Only the setted features will be considered.
        */
-    int getRandomFeature(Document base, int index);
+    int GetRandomFeature(Document base, int index) const;
     
     /* Returns a random feature of the [index] position. */
-    int getRandomFeature(int index);
+    int GetRandomFeature(int index) const;
+
+  private:
+    std::vector<Document> _vDocuments;
 };
 
 #endif

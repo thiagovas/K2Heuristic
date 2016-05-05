@@ -5,36 +5,36 @@ using namespace std;
 Document::Document(int _nFeatures, int defaultvalue)
 {
   this->nFeatures = _nFeatures;
-  this->initFeatures(_nFeatures, defaultvalue);
+  this->InitFeatures(_nFeatures, defaultvalue);
 }
 
-void Document::initFeatures(int _nFeatures, int defaultvalue)
+void Document::InitFeatures(int _nFeatures, int defaultvalue)
 {
   this->features = vector<int>(_nFeatures, defaultvalue);
   this->setted = vector<bool>(_nFeatures, false);
 }
 
 /* Given an index, this function returns its respective feature */
-int Document::getFeature(int index)
+int Document::GetFeature(int index) const
 {
-  this->assertIndex(index);
+  this->AssertIndex(index);
   return this->features[index];
 }
 
-void Document::setFeature(int index, int value)
+void Document::SetFeature(int index, int value)
 {
-  this->assertIndex(index);
+  this->AssertIndex(index);
   this->setted[index]=true;
   this->features[index]=value;
 }
 
-bool Document::isSetted(int index)
+bool Document::IsSetted(int index) const
 {
-  this->assertIndex(index);
-  return this->setted[index]=true;
+  this->AssertIndex(index);
+  return (this->setted[index]==true);
 }
 
-bool Document::hasSameSettedFeatures(Document base)
+bool Document::HasSameSettedFeatures(Document &base) const
 {
   bool resp=true;
   int i=0, j=0;
@@ -67,7 +67,7 @@ bool Document::hasSameSettedFeatures(Document base)
   return resp;
 }
 
-inline void Document::assertIndex(int index)
+inline void Document::AssertIndex(int index) const
 {
   assert(this->features.size() > index);
   assert(index >= 0);

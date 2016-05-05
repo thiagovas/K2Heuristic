@@ -1,161 +1,73 @@
 #include "database.hpp"
 using namespace std;
 
-Database::Database(int nBins)
-{ this->_nBins = nBins; }
-
-Database::Database(int nBins, vector<Document> vDocuments) : Database(nBins)
+Database::Database(vector<Document> &vDocuments)
 {
   this->_vDocuments = vDocuments;
 }
 
-void Database::addDocument(Document *d)
+void Database::AddDocument(Document *d)
 { this->_vDocuments.push_back(*d); }
 
-void Database::setvDocuments(vector<Document> vDocuments)
+void Database::SetvDocuments(vector<Document> vDocuments)
 { this->_vDocuments = vDocuments; }
 
-void Database::clearvDocuments()
+void Database::ClearvDocuments()
 { this->_vDocuments.clear(); }
 
-/* Pre Process every kind of feature data used by calcProb */
-void Database::preProcessFeatures()
-{
-  this->_uniqueFeatures.clear();
-  this->_uniqueFeatures.resize(this->_nBins);
-  for (unsigned int i = 0; i < this->_vDocuments.size(); i++)
-    for(int j = 0; j < this->_nBins; j++)
-      this->_uniqueFeatures[j].insert(this->_vDocuments[i].getFeature(j));
-  
-  /* Refreshing _countFeatures */
-  this->_countFeatures.assign(this->_uniqueFeatures.size(), 0);
-  for(unsigned int i = 0; i < this->_uniqueFeatures.size(); i++)
-    this->_countFeatures[i] = this->_uniqueFeatures[i].size();
-}
-
-/*
- *  This function returns the number of documents that has
- *  feature[node1]=value 1 and feature[node2]=value2
- */
-int Database::countOcurrences(int node1, int value1, int node2, int value2)
-{
-    int cont=0;
-    for(vector<Document>::iterator it = this->_vDocuments.begin(); it != this->_vDocuments.end(); it++)
-      if(it->getFeature(node1)==value1 && it->getFeature(node2)==value2) cont++;
-    return cont;
-}
-
-int Database::countOcurrences(int node, int value, map<int, int> parents)
-{
-  int c=0; // Counter
-  for (unsigned int i = 0; i < this->_vDocuments.size(); i++)
-  {
-    if(this->_vDocuments[i].getFeature(node)!=value) continue;
-    
-    bool agree=true;
-    for(map<int, int>::iterator it = parents.begin(); it != parents.end(); it++)
-      if(this->_vDocuments[i].getFeature(it->first)!=it->second)
-      {
-        agree=false;
-        break;
-      }
-    if(agree) c++;
-  }
-  return c;
-}
-
-/* Basically calculates \sum_{begin}^{end} */
-double Database::calcSum(int begin, int end)
-{
-  if(end < begin) return 0;
-  double resp=0;
-  for(int i = max(2, begin); i <= end; i++)
-    resp += log(i);
-  return resp;
-}
-
 /* Returns the log of the probability function, for precision issues. */
-double Database::calcProb(int node, parents vp)
+double Database::CalcProb(int node, parents &vp, int extraParent)
 {
-  double resp=0;
-  double nij = 0; // Just following the paper's names.
-  double lhsp=0, rhs=0; // Left Hand Side and Right Hand Side of the Productory
-  double div=0; // (Nij + ri - 1)
+  IndexTree tree;
+  tree.Initialize(this->_vDocuments, node);
   
-  if(this->_uniqueFeatures.size()==0) this->preProcessFeatures();
+  for(auto it = vp.myParents.begin(); it != vp.myParents.end(); it++)
+    tree.AddParent(*it);
   
-  set<map<int, int> > parentsInstances;
-  for(unsigned int i = 0; i < this->_vDocuments.size(); i++)
-  {
-    map<int, int> parentsValues;
-    for(auto it = vp.myParents.begin(); it != vp.myParents.end(); it++)
-      parentsValues[*it] = this->_vDocuments[i].getFeature(*it);
-    parentsInstances.insert(parentsValues);
-  }
+  if(extraParent != -1)
+    tree.AddParent(extraParent);
   
-  for(set<map<int, int> >::iterator nJt = parentsInstances.begin(); nJt != parentsInstances.end(); nJt++)
-  {
-    nij=0;
-
-    for(set<int>::iterator nIt = this->_uniqueFeatures[node].begin(); nIt != this->_uniqueFeatures[node].end(); nIt++) // Foreach possible value of the node...
-    {
-      int ocurrences = countOcurrences(node, *nIt, *nJt);
-      rhs += calcSum(1, ocurrences);
-      nij+=ocurrences;
-    }
-    div += calcSum(1, nij+this->_countFeatures[node]-1);
-    lhsp += calcSum(1, this->_countFeatures[node]-1);
-  }
-  resp = lhsp+rhs-div;
-  
-  return resp;
-}
-
-/* Returns the log of the probability function, for precision issues. */
-double Database::calcProb(int node, parents vp, int extraParent)
-{
-  vp.myParents.insert(extraParent);
-  return calcProb(node, vp);
+  return tree.CalcProb();
 }
 
 /* Returns a random feature of the [index] position. */
-int Database::getRandomFeature(int index)
+int Database::GetRandomFeature(int index) const
 {
   vector<int> selectedDocuments;
   
   for(int i = 0; i < this->_vDocuments.size(); i++)
-    if(this->_vDocuments[i].isSetted(index))
+    if(this->_vDocuments[i].IsSetted(index))
         selectedDocuments.push_back(i);
   srand(time(NULL));
-
+  
   if(selectedDocuments.size()==0) return INF;
   int randomIndex = rand()%selectedDocuments.size();
   randomIndex = selectedDocuments[randomIndex];
   
-  return this->_vDocuments[randomIndex].getFeature(index);
+  return this->_vDocuments[randomIndex].GetFeature(index);
 }
 
-int Database::getRandomFeature(Document base, int index)
+int Database::GetRandomFeature(Document base, int index) const
 {
   /* TODO: After implementing the index tree, better this method using it. */
   
   vector<int> selectedDocuments;
   for(int i = 0; i < this->_vDocuments.size(); i++)
-    if(this->_vDocuments[i].hasSameSettedFeatures(base)
-       && this->_vDocuments[i].isSetted(index))
+    if(this->_vDocuments[i].HasSameSettedFeatures(base)
+       && this->_vDocuments[i].IsSetted(index))
         selectedDocuments.push_back(i);
   srand(time(NULL));
-
+  
   if(selectedDocuments.size()==0)
-    return base.getFeature(index);
+    return base.GetFeature(index);
   
   int randomIndex = rand()%selectedDocuments.size();
   randomIndex = selectedDocuments[randomIndex];
-  return this->_vDocuments[randomIndex].getFeature(index);
+  return this->_vDocuments[randomIndex].GetFeature(index);
 }
 
 /* It generates a new point, based on the network */
-vector<int> Database::generateNewPoint(vector<parents> vp)
+vector<int> Database::GenerateNewPoint(vector<parents> &vp) const
 {
   int current; // Current Node on the BFS
   queue<int> q;
@@ -174,15 +86,15 @@ vector<int> Database::generateNewPoint(vector<parents> vp)
     if(visited[current]) continue;
     
     if(vp[current].myParents.size()==0)
-      ret[current] = this->getRandomFeature(current);
+      ret[current] = this->GetRandomFeature(current);
     else
     {
       Document base(vp.size(), 0);
       
       for(auto it = vp[current].myParents.begin(); it != vp[current].myParents.end(); it++)
-        base.setFeature(*it, ret[*it]);
+        base.SetFeature(*it, ret[*it]);
       
-      ret[current] = this->getRandomFeature(base, current);
+      ret[current] = this->GetRandomFeature(base, current);
     }
     
     visited[current]=true;

@@ -16,7 +16,7 @@ main: k2 graph database
 k2: database graph
 	$(CC) -c $(SRC_DIR)/k2.cc -o $(OBJ_DIR)/k2.o -std=$(STD) -$(OPTM)
 
-database: document
+database: document indextree
 	$(CC) -c $(SRC_DIR)/database.cc -o $(OBJ_DIR)/database.o -std=$(STD) -$(OPTM)
 
 document:

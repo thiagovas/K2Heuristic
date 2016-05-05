@@ -13,9 +13,9 @@ class K2
     
   public:
     K2();
-    void setGraph(Graph<int> *g);
-    void runK2(Database *db, int u);
-    vector<parents> getParents();
+    void SetGraph(Graph<int> *g);
+    void RunK2(Database *db, int u);
+    vector<parents> GetParents() const;
     
 };
 
